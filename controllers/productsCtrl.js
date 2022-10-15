@@ -85,6 +85,27 @@ exports.getProductByBarcode = async (req, res) => {
         })
 };
 
+exports.getProductsSold = async (req, res) => {
+    await Products.findAll({ raw: true })
+        .then((products) => {
+            if (!products.length) {
+                res.status(404).json({ error: "Products not found." });
+            } else {
+                let productsSold = [];
+                for (let i = 0; i < products.length; i++) {
+                    if (products[i].quantitySold > 0) {
+                        productsSold.push(products[i]);
+                    }
+                }
+                res.status(200).json(productsSold);
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({ error: "Server error while getting products" });
+        })
+}
+
 exports.updateProduct = async (req, res) => {
     const product = req.body;
     product.name = (product.name).toLowerCase();

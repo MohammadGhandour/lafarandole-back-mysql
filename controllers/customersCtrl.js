@@ -5,7 +5,6 @@ exports.addCustomer = async (req, res) => {
 
     let customer = req.body.customer;
     const newTotal = req.body.finalTotal;
-    console.log(customer);
 
     await Customers.findOne({ where: { customerNumber: customer.customerNumber } })
         .then(customerAlreadyExist => {
@@ -27,7 +26,7 @@ exports.addCustomer = async (req, res) => {
                     { where: { customerNumber: customer.customerNumber } }
                 )
                     .then(response => {
-                        res.status(200).json({ message: "Old user's infos updated successfully." + response })
+                        res.status(200).json(response);
                     })
                     .catch(err => {
                         console.log(err);
@@ -36,7 +35,7 @@ exports.addCustomer = async (req, res) => {
             } else {
                 customer.totalOfAllOrders = newTotal;
                 customer.numberOfOrders = 1;
-                Customers.create(customer)
+                Customers.create(customer, { raw: true })
                     .then(customer => {
                         res.status(200).json(customer)
                     })

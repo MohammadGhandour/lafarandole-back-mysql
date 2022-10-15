@@ -4,6 +4,7 @@ const path = require('path');
 const db = require('./models');
 const cors = require('cors');
 const PORT = process.env.PORT || 2022;
+const FORCE = false;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,7 +35,7 @@ app.use('/api/customers', customersRoutes);
 //     res.sendFile(path.join(__dirname, '../build'))
 // });
 
-db.sequelize.sync({ force: true })
+db.sequelize.sync({ force: FORCE })
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);

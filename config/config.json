@@ -1,11 +1,11 @@
 {
   "development": {
     "username": "root",
-    "password": "Moh_mysqlpassword2022",
-    "database": "lafarandolemysql",
+    "password": "Moh_15528002004mysqlpassword",
+    "database": "lafarandolesystemdatabase",
     "host": "localhost",
     "dialect": "mysql",
-    "port": 3307
+    "port": 3306
   },
   "test": {
     "username": "root",
