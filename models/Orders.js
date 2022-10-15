@@ -8,8 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         cost: { type: DataTypes.DECIMAL(11, 2), allowNull: false },
         discount: { type: DataTypes.STRING, allowNull: true },
         profit: { type: DataTypes.DECIMAL(11, 2), allowNull: false },
-        cart: { type: DataTypes.JSON, allowNull: false },
-        customerId: { type: DataTypes.INTEGER, allowNull: true }
+        cart: { type: DataTypes.JSON, allowNull: false }
     })
 
     return Orders;
