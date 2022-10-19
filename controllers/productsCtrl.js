@@ -12,7 +12,7 @@ exports.addProduct = async (req, res) => {
             } else {
                 const product = req.body;
                 const photo = req.file ? `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}` : null;
-                product.name = (product.name).toLowerCase();
+                product.name = product.name;
                 product.photo = photo;
                 product.inStock = product.quantity;
                 product.quantitySold = 0;
@@ -108,7 +108,7 @@ exports.getProductsSold = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     const product = req.body;
-    product.name = (product.name).toLowerCase();
+    product.name = (product.name);
     product.price = Number(product.price).toFixed(2);
     product.cost = Number(product.cost).toFixed(2);
     product.inStock = product.quantity;

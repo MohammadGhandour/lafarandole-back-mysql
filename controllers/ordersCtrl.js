@@ -1,4 +1,3 @@
-const e = require('express');
 const { Orders } = require('../models');
 const { Products } = require('../models');
 const { Customers } = require('../models');
