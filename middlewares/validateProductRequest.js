@@ -9,8 +9,6 @@ module.exports = (req, res, next) => {
     const cost = product.cost;
     const price = product.price;
 
-    console.log(product);
-
     let emptyFields = [];
 
     if (name === '') {
