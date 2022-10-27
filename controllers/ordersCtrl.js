@@ -81,6 +81,8 @@ exports.updateOrder = async (req, res) => {
         }
     }
 
+    console.log(productsToReturn);
+
     for (let i = 0; i < oldCart.length; i++) {
         for (let j = 0; j < productsToReturn.length; j++) {
             if (oldCart[i].id === productsToReturn[j].id) {
@@ -93,45 +95,33 @@ exports.updateOrder = async (req, res) => {
             } else {
                 console.log('I am not doing anything');
             }
+
+            Products.findByPk(productsToReturn[j].id)
+                .then(res => {
+                    let productToUpdate = res;
+                    productToUpdate.quantity = Number(productToUpdate.quantity) + Number(productsToReturn[j].quantity);
+                    productToUpdate.inStock = Number(productToUpdate.inStock) + Number(productsToReturn[j].quantity);
+                    productToUpdate.quantitySold = Number(productToUpdate.quantitySold) - Number(productsToReturn[j].quantity);
+                    Products.update(
+                        {
+                            quantity: productToUpdate.quantity,
+                            inStock: productToUpdate.inStock,
+                            quantitySold: productToUpdate.quantitySold
+                        },
+                        { where: { id: productsToReturn[j].id } }
+                    )
+                        .then(newProductAfterUpdate => {
+                        })
+                        .catch(err => {
+                            console.log(err);
+                            res.status(400).json({ error: err })
+                        })
+                })
         }
-        Products.findByPk(oldCart[i].id)
-            .then(res => {
-                let productToUpdate = res;
-                productToUpdate.quantity = Number(productToUpdate.quantity) + Number(oldCart[i].quantity);
-                productToUpdate.inStock = Number(productToUpdate.inStock) + Number(oldCart[i].quantity);
-                productToUpdate.quantitySold = Number(productToUpdate.quantitySold) - Number(oldCart[i].quantity);
-                Products.update(
-                    {
-                        quantity: productToUpdate.quantity,
-                        inStock: productToUpdate.inStock,
-                        quantitySold: productToUpdate.quantitySold
-                    },
-                    { where: { id: oldCart[i].id } }
-                )
-                    .then(newProductAfterUpdate => {
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(400).json({ error: err })
-                    })
-            })
     }
 
 
     let totalOfProductsThatWillStay = finalCart.reduce((total, item) => ((total + item.quantity * item.priceAfterDiscount)), 0);
-
-    // if (oldOrder.discount) {
-    //     let discountCurrencyPERCENT = oldOrder.discount.split('%');
-    //     let discountCurrencyUSD = oldOrder.discount.split('USD');
-    //     let discountCurrencyLBP = oldOrder.discount.split('LBP');
-    //     if (discountCurrencyPERCENT.length > 1) {
-    //         totalOfProductsThatWillStay = totalOfProductsThatWillStay - (discountCurrencyPERCENT[0] / 100 * totalOfProductsThatWillStay);
-    //     } else if (discountCurrencyUSD.length > 1) {
-    //         totalOfProductsThatWillStay = totalOfProductsThatWillStay - discountCurrencyUSD[0];
-    //     } else if (discountCurrencyLBP > 1) {
-    //         totalOfProductsThatWillStay = totalOfProductsThatWillStay - (discountCurrencyLBP[0] / currencyExchange)
-    //     }
-    // }
 
     if (orderToAdd.discount) {
         let discountCurrencyPERCENT = orderToAdd.discount.split('%');
@@ -184,7 +174,6 @@ exports.updateOrder = async (req, res) => {
     let finalTotal = Number(total + totalOfProductsThatWillStay).toFixed(2);
 
     if (oldOrder.customerNumber) {
-        console.log("There is a customer number");
         Customers.findOne({ where: { customerNumber: oldOrder.customerNumber } })
             .then(response => {
                 let oldCustomer = response.dataValues;
@@ -194,7 +183,6 @@ exports.updateOrder = async (req, res) => {
                     numberOfOrders: oldCustomer.numberOfOrders,
                     totalOfAllOrders: (Number(oldCustomer.totalOfAllOrders) - Number(oldOrder.total)) + Number(finalTotal)
                 }
-                console.log(newVersionOfCustomer);
                 Customers.update(
                     {
                         customerName: newVersionOfCustomer.customerName,
