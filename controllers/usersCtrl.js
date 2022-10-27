@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
                                     userId: user.id,
                                     token: jwt.sign(
                                         { userId: user.id },
-                                        'PDQ8v94SswOcgMnqlUTd',
+                                        process.env.RANDOM_TOKEN,
                                         { expiresIn: '365d' }
                                     )
                                 });
@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
                                 admin: user.admin,
                                 token: jwt.sign(
                                     { userId: user.id },
-                                    'PDQ8v94SswOcgMnqlUTd',
+                                    process.env.RANDOM_TOKEN,
                                     { expiresIn: '365d' }
                                 )
                             })
