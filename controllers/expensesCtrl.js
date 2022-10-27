@@ -23,3 +23,20 @@ exports.getExpenses = async (req, res) => {
             res.status(404).json({ error: "Expenses not found." })
         })
 };
+
+exports.deleteExpense = async (req, res) => {
+    const id = req.params.id;
+    await Expenses.findByPk(id)
+        .then(expense => {
+            expense = expense.dataValues
+            Expenses.destroy({ where: { id: id } })
+                .then(() => res.status(200).json({ message: "Expense deleted." }))
+                .catch(error => {
+                    res.status(400).json(error);
+                });
+        })
+        .catch(error => {
+            res.status(500).json(error);
+            console.log(error);
+        })
+}
