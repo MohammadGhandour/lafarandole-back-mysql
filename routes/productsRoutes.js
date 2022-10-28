@@ -12,5 +12,6 @@ router.get('/products-sold', auth, productsCtrl.getProductsSold)
 router.get('/product-by-barcode/:barcode', auth, productsCtrl.getProductByBarcode)
 router.put('/:id', auth, multer, validateProductRequest, productsCtrl.updateProduct)
 router.delete('/:id', auth, productsCtrl.deleteProduct)
+router.get('/alterAllProducts', productsCtrl.alterAllProducts)
 
 module.exports = router;
