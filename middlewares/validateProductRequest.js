@@ -3,6 +3,7 @@ module.exports = (req, res, next) => {
     const name = product.name;
     const barcode = product.barcode;
     const category = product.category;
+    const brand = product.brand;
     const size = product.size;
     const gender = product.gender;
     const quantity = product.quantity;
@@ -19,6 +20,9 @@ module.exports = (req, res, next) => {
     }
     if (category === '') {
         emptyFields.push("category");
+    }
+    if (brand === '') {
+        emptyFields.push("brand");
     }
     if (size === '') {
         emptyFields.push("size");

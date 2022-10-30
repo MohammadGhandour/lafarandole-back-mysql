@@ -198,30 +198,6 @@ exports.deleteProduct = async (req, res) => {
 }
 
 exports.alterAllProducts = async (req, res) => {
-
-    // const brands = [
-    //     'minora',
-    //     'andywawa',
-    //     'babydola',
-    //     'h&m',
-    //     'nipperland',
-    //     'mixbabi',
-    //     'leoking',
-    //     'tongs',
-    //     'bebus',
-    //     'tafyy',
-    //     'diab',
-    //     'toysi',
-    //     'minibubbles',
-    //     'monnarosa',
-    //     'newmission',
-    //     'newlenza',
-    //     'mspn',
-    //     'belemir',
-    //     'funny',
-    //     'minipodyum',
-    // ]
-
     const brands = [
         "babydola",
         "nipperland",
@@ -300,25 +276,27 @@ exports.alterAllProducts = async (req, res) => {
         "limones",
         "emins",
         "panda",
-        "bignile"
+        "bignile",
+        "fame",
+        "kadriye",
+        "nevermore"
     ]
     console.log('hey');
 
     await Products.findAll({ raw: true }, { order: [['createdAt', 'ASC']] })
         .then(products => {
-            // console.log(products.length);
-            // products.forEach(product => {
-            //     if (product.brand === '') {
-            //         Products.update(
-            //             { brand: brands.includes(product.name.split(' ')[0]) ? product.name.split(' ')[0] : '' },
-            //             { where: { id: product.id } }
-            //         )
-            //             .then(newProduct => { })
-            //             .catch(err => {
-            //                 console.log(err);
-            //             })
-            //     }
-            // });
+            products.forEach(product => {
+                if (product.brand === '' || product.brand === null) {
+                    Products.update(
+                        { brand: brands.includes(product.name.split(' ')[0]) ? product.name.split(' ')[0] : '' },
+                        { where: { id: product.id } }
+                    )
+                        .then(newProduct => { })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
+            });
             // const unbrandedProducts = products.filter(product => product.brand === '');
             // console.log(unbrandedProducts.length);
             res.status(200).json(products);
