@@ -8,11 +8,11 @@ const FORCE = false;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// app.use(cors());
 
-// app.use(cors({
-//     origin: 'http://lafarandoleparis.com';
-// }));
+app.use(cors({
+    origin: 'http://lafarandoleparis.com'
+}));
 
 app.use('/api/images', express.static(path.join(__dirname, 'images')));
 
