@@ -30,7 +30,7 @@ exports.addCustomer = async (req, res) => {
                     })
                     .catch(err => {
                         console.log(err);
-                        res.status(400).json({ error: "Something went wrong" })
+                        res.status(500).json({ error: "Something went wrong" })
                     })
             } else {
                 customer.totalOfAllOrders = newTotal;
@@ -47,7 +47,7 @@ exports.addCustomer = async (req, res) => {
         })
         .catch(err => {
             console.log(err);
-            res.status(404).json({ error: "Something went wrong." })
+            res.status(500).json({ error: "Something went wrong." })
         })
 };
 

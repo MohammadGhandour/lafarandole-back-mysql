@@ -60,7 +60,7 @@ exports.getOneProduct = async (req, res) => {
     await Products.findByPk(productId)
         .then((product) => {
             if (product === null) {
-                res.status(200).json({ Message: "Product not found" });
+                res.status(404).json({ error: "Product not found" });
             } else {
                 res.status(200).json(product);
             }
