@@ -212,7 +212,8 @@ exports.updateOrder = async (req, res) => {
         cost: cost.toFixed(2),
         discount: orderToAdd.discount,
         profit: Number(finalTotal) - Number(cost),
-        cart: finalCart
+        cart: finalCart,
+        promoCode: oldOrder.promoCode
     }, { where: { id: orderId } })
         .then(newFinalOrder => {
             console.log(newFinalOrder);
