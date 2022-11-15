@@ -9,6 +9,12 @@ exports.postOrder = async (req, res) => {
     const itemsNumber = cart.reduce((totalItems, item) => ((totalItems + item.quantity)), 0);
     order.itemsNumber = itemsNumber;
 
+    if (order.orderLocation === 'Instagram Delivery') {
+        order.paid = false;
+    } else {
+        order.paid = true;
+    }
+
     cart.map(item => {
         Products.findByPk(item.id)
             .then(res => {
@@ -213,7 +219,8 @@ exports.updateOrder = async (req, res) => {
         discount: orderToAdd.discount,
         profit: Number(finalTotal) - Number(cost),
         cart: finalCart,
-        promoCode: oldOrder.promoCode
+        promoCode: oldOrder.promoCode,
+        paid: oldOrder.paid
     }, { where: { id: orderId } })
         .then(newFinalOrder => {
             console.log(newFinalOrder);
@@ -272,5 +279,29 @@ exports.getOrdersForChart = async (req, res) => {
         .catch(err => {
             console.log(err);
             res.status(500).json({ error: "Server Error while getting orders." })
+        })
+};
+
+exports.updateOrderStatus = async (req, res) => {
+    const id = req.params.id;
+    await Orders.findByPk(id, { raw: true })
+        .then(order => {
+            if (order === null) {
+                res.status(404).json({ error: `Order with id ${id} is not found.` })
+            } else {
+                Orders.update({ paid: req.body.updatePaidTo }, { where: { id: id } })
+                    .then(newOrder => {
+                        return newOrder
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(400).json({ error: "For some reason an error has occured" });
+                    })
+                res.status(200).json({ message: 'Order updated successfully.' });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Server Error while updating the order's status." });
         })
 };

@@ -9,5 +9,6 @@ router.get('/', auth, ordersCtrl.getOrders);
 router.get('/chart', auth, ordersCtrl.getOrdersForChart);
 router.get('/:id', auth, ordersCtrl.getOrder);
 router.get('/customerOrders/:customerNumber', auth, ordersCtrl.getCustomerOrders);
+router.put('/orderStatus/:id', auth, ordersCtrl.updateOrderStatus);
 
 module.exports = router;
