@@ -305,3 +305,15 @@ exports.updateOrderStatus = async (req, res) => {
             res.status(500).json({ error: "Server Error while updating the order's status." });
         })
 };
+
+exports.getOrdersForPromo = async (req, res) => {
+    await Orders.findAll({ raw: true })
+        .then(response => {
+            const orders = response.filter(order => order.promoCode !== null && order.promoCode !== '');
+            res.status(200).json(orders);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Error while retrieving orders with promo codes" })
+        })
+};
