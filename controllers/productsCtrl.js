@@ -2,46 +2,64 @@ const { Products } = require('../models');
 const fs = require('fs');
 
 exports.addProduct = async (req, res) => {
-    await Products.findOne({ where: { barcode: req.body.barcode } })
-        .then(productAlreadyExist => {
-            if (productAlreadyExist !== null) {
-                res.status(400).json({
-                    error: "A product with this barcode already exists.",
-                    productId: productAlreadyExist.id,
-                })
-            } else {
-                const product = req.body;
-                const photo = req.file ? `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}` : null;
-                product.name = product.name;
-                product.photo = photo;
-                product.inStock = product.quantity;
-                product.quantitySold = 0;
-                product.price = Number(product.price).toFixed(2);
-                product.cost = Number(product.cost).toFixed(2);
+    const arrayOfSizes = JSON.parse(req.body.arrayOfSizes);
 
-                if (product.discount === '') {
-                    product.discount === 0;
-                }
+    const productOriginalBarcode = req.body.barcode;
+    const productOriginalSize = req.body.size;
+    const productOriginalQuantity = req.body.quantity;
 
-                if (product.discount === 0) {
-                    product.priceAfterDiscount = product.price;
+    const productOriginalSizeBarcode = { size: productOriginalSize, barcode: productOriginalBarcode, quantity: productOriginalQuantity };
+    arrayOfSizes.push(productOriginalSizeBarcode);
+
+    let numberOfSuccessfullyAddedProducts = 0;
+
+    arrayOfSizes.map(productVariant => {
+        Products.findOne({ where: { barcode: productVariant.barcode } })
+            .then(productAlreadyExist => {
+                if (productAlreadyExist !== null) {
+                    return res.status(400).json({
+                        error: "A product with this barcode already exists.",
+                        productId: productAlreadyExist.id,
+                    })
                 } else {
-                    product.priceAfterDiscount = Number(product.price - (product.price * (product.discount / 100))).toFixed(2);
-                }
+                    const product = req.body;
+                    const photo = req.file ? `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}` : null;
+                    product.name = product.name;
+                    product.photo = photo;
+                    product.quantity = productVariant.quantity;
+                    product.quantitySold = 0;
+                    product.inStock = productVariant.quantity;
+                    product.price = Number(product.price).toFixed(2);
+                    product.cost = Number(product.cost).toFixed(2);
+                    product.barcode = productVariant.barcode;
+                    product.size = productVariant.size;
 
-                Products.create(product)
-                    .then((product) => {
-                        res.status(201).json(product);
-                    })
-                    .catch((err) => {
-                        res.status(500).json({ message: "Server error while adding the product !" });
-                        console.log(err);
-                    })
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        })
+                    if (product.discount === '') {
+                        product.discount === 0;
+                    }
+
+                    if (product.discount === 0) {
+                        product.priceAfterDiscount = product.price;
+                    } else {
+                        product.priceAfterDiscount = Number(product.price - (product.price * (product.discount / 100))).toFixed(2);
+                    }
+
+                    Products.create(product)
+                        .then((product) => {
+                            numberOfSuccessfullyAddedProducts++;
+                            if (numberOfSuccessfullyAddedProducts === arrayOfSizes.length) res.status(201).json(product);
+                            else return
+                        })
+                        .catch((err) => {
+                            res.status(500).json({ message: "Server error while adding the product !" });
+                            console.log(err);
+                        })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    })
 };
 
 exports.getAllProducts = async (req, res) => {
