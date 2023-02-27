@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
         cart: { type: DataTypes.JSON, allowNull: false },
         orderLocation: { type: DataTypes.STRING, allowNull: false },
         promoCode: { type: DataTypes.STRING, allowNull: false },
-        paid: { type: DataTypes.BOOLEAN, allowNull: false, default: 0 }
+        paid: { type: DataTypes.BOOLEAN, allowNull: false, default: 0 },
+        salesperson_id: { type: DataTypes.INTEGER, allowNull: false, default: 0 }
     })
 
     return Orders;

@@ -5,6 +5,7 @@ const { Customers } = require('../models');
 exports.postOrder = async (req, res) => {
     const order = req.body;
     const cart = order.cart;
+    order.salesperson_id = req.auth.userId
 
     const itemsNumber = cart.reduce((totalItems, item) => ((totalItems + item.quantity)), 0);
     order.itemsNumber = itemsNumber;
@@ -86,8 +87,6 @@ exports.updateOrder = async (req, res) => {
             finalCart = oldCart;
         }
     }
-
-    console.log(productsToReturn);
 
     for (let i = 0; i < oldCart.length; i++) {
         for (let j = 0; j < productsToReturn.length; j++) {
@@ -220,10 +219,10 @@ exports.updateOrder = async (req, res) => {
         profit: Number(finalTotal) - Number(cost),
         cart: finalCart,
         promoCode: oldOrder.promoCode,
-        paid: oldOrder.paid
+        paid: oldOrder.paid,
+        salesperson_id: oldOrder.salesperson_id
     }, { where: { id: orderId } })
         .then(newFinalOrder => {
-            console.log(newFinalOrder);
             res.status(200).json({ message: 'Order updated successfully.' });
         })
         .catch(err => {

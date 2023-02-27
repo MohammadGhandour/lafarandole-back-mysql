@@ -1,6 +1,8 @@
 const { Users } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Orders } = require("../models");
+const { Op } = require("sequelize");
 require('dotenv').config();
 
 exports.register = async (req, res) => {
@@ -89,3 +91,8 @@ exports.getUsers = async (req, res) => {
             res.status(404).json({ error: "Couldn't find user with id: " + userId })
         })
 };
+
+exports.getOneUser = async (req, res) => {
+    const usersOrdersSold = await Orders.findAll({ raw: true, where: { salesperson_id: req.params.id } });
+    res.status(200).json(usersOrdersSold);
+}
