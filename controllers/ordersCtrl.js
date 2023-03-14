@@ -1,11 +1,12 @@
 const { Orders } = require('../models');
 const { Products } = require('../models');
 const { Customers } = require('../models');
+const { Op } = require("sequelize");
 
 exports.postOrder = async (req, res) => {
     const order = req.body;
     const cart = order.cart;
-    order.salesperson_id = req.auth.userId
+    // order.salesperson_id = req.auth.userId;
 
     const itemsNumber = cart.reduce((totalItems, item) => ((totalItems + item.quantity)), 0);
     order.itemsNumber = itemsNumber;
@@ -232,14 +233,27 @@ exports.updateOrder = async (req, res) => {
 };
 
 exports.getOrders = async (req, res) => {
-    await Orders.findAll({ order: [['createdAt', 'DESC']] })
-        .then(orders => {
-            res.status(200).json(orders)
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: "Server Error while getting orders." })
-        })
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (req.auth.userId === 1 || req.auth.userId === 2) {
+        await Orders.findAll({ order: [['createdAt', 'DESC']] })
+            .then(orders => {
+                res.status(200).json(orders)
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ error: "Server Error while getting orders." })
+            })
+    } else {
+        await Orders.findAll({ where: { createdAt: { [Op.gte]: startOfDay, } } })
+            .then(orders => {
+                res.status(200).json(orders.reverse())
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ error: "Server Error while getting orders." })
+            })
+    }
 };
 
 exports.getOrder = async (req, res) => {
