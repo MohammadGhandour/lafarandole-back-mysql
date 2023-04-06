@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/', auth, customersCtrl.addCustomer);
 router.get('/', auth, customersCtrl.getCustomers);
+router.get('/customers-drop-down', auth, customersCtrl.getCustomersDropDown);
 router.get('/:customerName', auth, customersCtrl.getCustomerOrders);
 
 module.exports = router;

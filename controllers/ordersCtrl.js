@@ -284,7 +284,7 @@ exports.getCustomerOrders = async (req, res) => {
 };
 
 exports.getOrdersForChart = async (req, res) => {
-    await Orders.findAll({})
+    await Orders.findAll({ raw: true, attributes: ["id", "itemsNumber", "totalBeforeDiscount", "total", "cost", "profit", "orderLocation", "createdAt"] })
         .then(orders => {
             const sortedOrders = orders.sort((a, b) => a.createdAt - b.createdAt);
             res.status(200).json(sortedOrders)
@@ -320,7 +320,7 @@ exports.updateOrderStatus = async (req, res) => {
 };
 
 exports.getOrdersForPromo = async (req, res) => {
-    await Orders.findAll({ raw: true })
+    await Orders.findAll({ raw: true, attributes: ["total", "profit", "promoCode"] },)
         .then(response => {
             const orders = response.filter(order => order.promoCode !== null && order.promoCode !== '');
             res.status(200).json(orders);

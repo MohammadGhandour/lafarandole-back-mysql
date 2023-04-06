@@ -63,6 +63,18 @@ exports.getCustomers = async (req, res) => {
         })
 };
 
+exports.getCustomersDropDown = async (req, res) => {
+    await Customers.findAll({ raw: true, attributes: ["customerNumber", "customerName", "id"] })
+        .then(customers => {
+            const sortedCustomers = customers.sort((a, b) => b.totalOfAllOrders - a.totalOfAllOrders);
+            res.status(200).json(sortedCustomers);
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Server Error while getting customers." })
+        })
+};
+
 exports.getCustomerOrders = async (req, res) => {
     await Orders.findAll({ where: { customerName: req.params.customerName }, raw: true })
         .then(orders => {
