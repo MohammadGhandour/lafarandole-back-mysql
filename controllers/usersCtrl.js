@@ -93,6 +93,24 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.getOneUser = async (req, res) => {
-    const usersOrdersSold = await Orders.findAll({ raw: true, where: { salesperson_id: req.params.id } });
-    res.status(200).json(usersOrdersSold);
+    const { endDate, startDate } = req.query;
+
+    let where = { salesperson_id: req.params.id }
+    if (endDate && startDate) {
+        where.createdAt = {
+            [Op.between]: [new Date(startDate), new Date(endDate)],
+        }
+    }
+    const usersOrdersSold = await Orders.findAll({
+        raw: true, where
+    });
+    res.status(200).json(usersOrdersSold.reverse());
+};
+
+exports.hash = (req, res) => {
+    bcrypt.hash("Employee12345678", 10)
+        .then((hash) => {
+            console.log(hash);
+            res.status(200).json(hash);
+        })
 }

@@ -1,5 +1,6 @@
 const { Products } = require('../models');
 const fs = require('fs');
+const { Op } = require("sequelize");
 
 exports.addProduct = async (req, res) => {
     const arrayOfSizes = JSON.parse(req.body.arrayOfSizes);
@@ -63,13 +64,109 @@ exports.addProduct = async (req, res) => {
 };
 
 exports.getAllProducts = async (req, res) => {
-    await Products.findAll({ order: [['createdAt', 'DESC']] })
-        .then((products) => {
-            res.status(200).json(products);
+    let {
+        page,
+        searchParams,
+        offset,
+        limit,
+        filters
+    } = req.query;
+    if (Number(page) === 1) { offset = 0 }
+    else offset = Number(page - 1) * Number(limit);
+
+    let where = {};
+    const arrayOfFilters = [];
+
+    if (filters) {
+        filters = JSON.parse(filters);
+        const gender = filters.filter(filter => filter.key === "gender");
+        const brand = filters.filter(filter => filter.key === "brand");
+        const category = filters.filter(filter => filter.key === "category");
+        const size = filters.filter(filter => filter.key === "size");
+
+        if (gender.length > 0) {
+            arrayOfFilters.push(
+                {
+                    [Op.or]: gender.map(filter => ({
+                        [Op.and]: [
+                            { gender: filter.value }
+                        ]
+                    }))
+                }
+            )
+        }
+        if (brand.length > 0) {
+            arrayOfFilters.push(
+                {
+                    [Op.or]: brand.map(filter => ({
+                        [Op.and]: [
+                            { brand: filter.value }
+                        ]
+                    }))
+                }
+            )
+        }
+        if (category.length > 0) {
+            arrayOfFilters.push(
+                {
+                    [Op.or]: category.map(filter => ({
+                        [Op.and]: [
+                            { category: filter.value }
+                        ]
+                    }))
+                }
+            )
+        }
+        if (size.length > 0) {
+            arrayOfFilters.push(
+                {
+                    [Op.or]: size.map(filter => ({
+                        [Op.and]: [
+                            { size: filter.value }
+                        ]
+                    }))
+                }
+            )
+        }
+    };
+
+    if (searchParams) {
+        arrayOfFilters.push(
+            {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.like]: `%${searchParams}%`
+                        }
+                    },
+                    {
+                        brand: {
+                            [Op.like]: `%${searchParams}%`
+                        }
+                    },
+                    {
+                        description: {
+                            [Op.like]: `%${searchParams}%`
+                        }
+                    },
+                ]
+            }
+        )
+    }
+    where = { [Op.and]: arrayOfFilters }
+    await Products.findAndCountAll({
+        where,
+        raw: true,
+        limit: Number(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']]
+    })
+        .then(response => {
+            res.status(200).json(response);
         })
         .catch(err => {
             console.log(err);
-            res.status(404).json({ error: "Product not found." })
+            res.status(500).json(err);
         })
 };
 

@@ -233,21 +233,77 @@ exports.updateOrder = async (req, res) => {
 };
 
 exports.getOrders = async (req, res) => {
+    let {
+        page,
+        searchParams,
+        offset,
+        limit,
+        filter
+    } = req.query;
+    if (Number(page) === 1) { offset = 0 }
+    else offset = Number(page - 1) * Number(limit);
+
+    let where = {};
+    const arrayOfFilters = [];
+
+    if (searchParams) {
+        arrayOfFilters.push(
+            {
+                [Op.or]: [
+                    { customerName: { [Op.like]: `%${searchParams}%` } },
+                    { customerNumber: { [Op.like]: `%${searchParams}%` } },
+                    { id: { [Op.like]: `%${searchParams}%` } },
+                ]
+            }
+        )
+    };
+
+    if (filter !== "last_added") {
+        arrayOfFilters.push(
+            {
+                [Op.or]: [
+                    {
+                        orderLocation: {
+                            [Op.like]: `%${filter}%`
+                        }
+                    }
+                ]
+            }
+        )
+    }
+
+    where = { [Op.and]: arrayOfFilters };
+
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     if (req.auth.userId === 1 || req.auth.userId === 2) {
-        await Orders.findAll({ order: [['createdAt', 'DESC']] })
+        await Orders.findAndCountAll({
+            where,
+            raw: true,
+            limit: Number(limit),
+            offset: offset,
+            order: [['createdAt', 'DESC']]
+        })
             .then(orders => {
-                res.status(200).json(orders)
+                // setTimeout(() => {
+                res.status(200).json(orders);
+                // }, 2000);
             })
             .catch(err => {
                 console.log(err);
                 res.status(500).json({ error: "Server Error while getting orders." })
             })
     } else {
-        await Orders.findAll({ where: { createdAt: { [Op.gte]: startOfDay, } } })
+        where.createdAt = { [Op.gte]: startOfDay }
+        await Orders.findAndCountAll({
+            where,
+            raw: true,
+            limit: Number(limit),
+            offset: offset,
+            order: [['createdAt', 'DESC']]
+        })
             .then(orders => {
-                res.status(200).json(orders.reverse())
+                res.status(200).json(orders)
             })
             .catch(err => {
                 console.log(err);
@@ -329,4 +385,16 @@ exports.getOrdersForPromo = async (req, res) => {
             console.log(err);
             res.status(500).json({ error: "Error while retrieving orders with promo codes" })
         })
+};
+
+exports.getOrdersForASpecificUser = async (req, res) => {
+    const { salesperson_id } = req.params;
+    const allOrdersForThisPerson = await Orders.findAll({ raw: true, where: { salesperson_id }, attributes: ["total", "salesperson_id", "createdAt"] });
+    console.log(allOrdersForThisPerson);
+    console.log(allOrdersForThisPerson.length);
+
+    const allTotal = allOrdersForThisPerson.reduce((total, order) => (total + Number(order.total)), 0);
+    console.log(allTotal);
+
+    res.status(200).json(allOrdersForThisPerson);
 };

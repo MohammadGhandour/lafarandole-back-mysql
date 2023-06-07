@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/', auth, ordersCtrl.postOrder);
 router.get('/ordersForPromo', auth, ordersCtrl.getOrdersForPromo);
+router.get('/salesperson/:salesperson_id', ordersCtrl.getOrdersForASpecificUser);
 router.get('/', auth, ordersCtrl.getOrders);
 router.get('/chart', auth, ordersCtrl.getOrdersForChart);
 router.put('/:id', auth, ordersCtrl.updateOrder);
