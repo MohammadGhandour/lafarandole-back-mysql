@@ -149,6 +149,11 @@ exports.getAllProducts = async (req, res) => {
                             [Op.like]: `%${searchParams}%`
                         }
                     },
+                    {
+                        barcode: {
+                            [Op.like]: `%${searchParams}%`
+                        }
+                    },
                 ]
             }
         )
