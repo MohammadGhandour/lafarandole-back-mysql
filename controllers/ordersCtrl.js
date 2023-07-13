@@ -398,3 +398,14 @@ exports.getOrdersForASpecificUser = async (req, res) => {
 
     res.status(200).json(allOrdersForThisPerson);
 };
+
+exports.getOrdersForAverageProgression = async (req, res) => {
+    await Orders.findAll({ order: [['createdAt', 'DESC']] })
+        .then(orders => {
+            res.status(200).json(orders)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Server Error while getting orders." })
+        })
+};

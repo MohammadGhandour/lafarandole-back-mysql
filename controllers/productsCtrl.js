@@ -262,7 +262,7 @@ exports.updateProduct = async (req, res) => {
                             }
                         }))
                     } else {
-                        product.photo = `${req.protocol}://${req.get('host')}/api/images/${previousPhoto}`;
+                        product.photo = oldProduct.photo;
                     }
                     Products.update({ ...req.body }, { where: { id: productId } })
                         .then(newProduct => {
