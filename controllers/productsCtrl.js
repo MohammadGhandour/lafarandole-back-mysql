@@ -134,26 +134,10 @@ exports.getAllProducts = async (req, res) => {
         arrayOfFilters.push(
             {
                 [Op.or]: [
-                    {
-                        name: {
-                            [Op.like]: `%${searchParams}%`
-                        }
-                    },
-                    {
-                        brand: {
-                            [Op.like]: `%${searchParams}%`
-                        }
-                    },
-                    {
-                        description: {
-                            [Op.like]: `%${searchParams}%`
-                        }
-                    },
-                    {
-                        barcode: {
-                            [Op.like]: `%${searchParams}%`
-                        }
-                    },
+                    { name: { [Op.and]: searchParams.split(' ').map(word => ({ [Op.like]: `%${word}%` })) } },
+                    { brand: { [Op.like]: `%${searchParams}%` } },
+                    { description: { [Op.like]: `%${searchParams}%` } },
+                    { barcode: { [Op.like]: `%${searchParams}%` } },
                 ]
             }
         )
