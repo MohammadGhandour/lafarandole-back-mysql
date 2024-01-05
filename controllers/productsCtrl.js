@@ -208,6 +208,7 @@ exports.getProductsSold = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     const product = req.body;
+    // return console.log(product);
     product.name = (product.name);
     product.price = Number(product.price).toFixed(2);
     product.cost = Number(product.cost).toFixed(2);

@@ -10,15 +10,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(cors());
 
-app.use(cors({
-    origin: 'https://lafarandoleparis.com'
-}));
+app.use(cors({ origin: 'https://lafarandoleparis.com' }));
 
 app.use('/api/images', express.static(path.join(__dirname, 'images')));
 
-app.get('/api', async (req, res) => {
-    res.status(200).json({ message: "Hello from lafarandole backend" })
-});
+app.get('/api', async (req, res) => { res.status(200).json({ message: "Hello from lafarandole backend" }) });
 
 const usersRoutes = require('./routes/usersRoutes');
 const productsRoutes = require('./routes/productsRoutes');
@@ -39,9 +35,7 @@ app.use('/api/expenses', expensesRoutes);
 
 db.sequelize.sync({ force: FORCE })
     .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        })
+        app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); })
     }).catch(err => {
         console.log('Couldnt connect to database');
         console.log(err);
