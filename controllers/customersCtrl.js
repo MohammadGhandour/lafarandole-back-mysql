@@ -85,3 +85,36 @@ exports.getCustomerOrders = async (req, res) => {
             res.status(500).json({ error: "Error retrieving orders for this customer" })
         })
 }
+
+exports.exportCustomers = async (req, res) => {
+    try {
+        const customers = (await Customers.findAll({ raw: true, order: [["createdAt", "ASC"]] }));
+        console.log(customers.length);
+        const final = [];
+        for (let customer of customers) {
+            const { customerName, customerNumber } = customer;
+            const { firstName, lastName } = splitName(customerName);
+            const finalCustomer = {
+                "First Name": firstName,
+                "Last Name": lastName,
+                "Email": "",
+                "Phone": `(+961) ${customerNumber}`,
+                "Accepts SMS Marketing": "yes"
+            };
+
+            final.push(finalCustomer);
+        };
+
+        console.log(final.length);
+        res.status(200).json(final);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(error);
+    }
+};
+
+function splitName(name) {
+    const [firstName, ...lastNameParts] = name.split(' ');
+    const lastName = lastNameParts.join(' ').trim();
+    return { firstName: firstName.trim(), lastName };
+}
