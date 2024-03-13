@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // app.use(cors());
-app.use(cors({ origin: ["https://lafarandoleparis.com", "https://invvest.co", "https://backend.invvest.co"] }));
+app.use(cors({ origin: "*" }));
 
 app.use("/api/images", express.static(path.join(__dirname, "images")));
 
@@ -41,10 +41,7 @@ app.post("/api/trade-republic/request-sms-code", async (req, res) => {
 
         const userAgent = req.get("user-agent");
         console.log({ phoneNumber, pin, "User-Agent": userAgent });
-        const response = await axios.post(`https://api.traderepublic.com/api/v1/auth/web/login`,
-            { phoneNumber, pin },
-            { headers: { "User-Agent": userAgent } }
-        );
+        const response = await axios.post(`https://api.traderepublic.com/api/v1/auth/web/login`, { phoneNumber, pin });
         console.log(response.data);
         res.status(200).json(response.data);
     } catch (error) {
