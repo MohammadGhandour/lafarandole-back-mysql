@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 2022;
 const FORCE = false;
 const axios = require("axios");
 const WebSocket = require("ws");
+const specificIP = "154.56.57.79";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -170,7 +171,7 @@ app.post("/api/trade-republic/submit-sms-code", async (req, res) => {
 
 db.sequelize.sync({ force: FORCE })
     .then(() => {
-        app.listen(PORT, () => { console.log(`Server running on port ${PORT}`); })
+        app.listen(PORT, specificIP, () => { console.log(`Server running on port ${PORT}`); })
     }).catch(err => {
         console.log("Couldnt connect to database");
         console.log(err);
