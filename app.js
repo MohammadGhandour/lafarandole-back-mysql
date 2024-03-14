@@ -171,7 +171,7 @@ app.post("/api/trade-republic/submit-sms-code", async (req, res) => {
 
 db.sequelize.sync({ force: FORCE })
     .then(() => {
-        app.listen(PORT, specificIP, () => { console.log(`Server running on port ${PORT}`); })
+        app.listen(PORT, "0.0.0.0", () => { console.log(`Server running on port ${PORT}`); })
     }).catch(err => {
         console.log("Couldnt connect to database");
         console.log(err);
